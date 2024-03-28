@@ -1,0 +1,36 @@
+.nav--desktop a[href="/about-us"] {
+  pointer-events: none;
+}
+
+/* Hide "powered by square"  */
+.free-footer {
+  display: none;
+}
+
+.sortable tbody tr:nth-child(even) {
+  background-color: #000;
+  color: #fff;
+}
+
+.sortable tbody tr:nth-child(even) {
+  background-color: #141414;
+  color: #fff;
+}
+
+.sortable thead {
+  background-color: #ed1d24;
+}
+
+.sortable tbody tr:hover {
+  background: #f9f9f9;
+  color: #000;
+}
+
+.datatable-input, .datatable-selector {
+  background-color: #141414;
+  color: #fff;
+}
+
+.datatable-pagination .datatable-active button, .datatable-pagination button:hover {
+  color: #000;
+}
