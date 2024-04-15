@@ -110,6 +110,7 @@ const main = () => {
 };
 
 const replaceCalendar = () => {
+  console.log('');
   var xpath = "//p[text()='<Calendar />']";
   var matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
     .singleNodeValue;
@@ -117,11 +118,11 @@ const replaceCalendar = () => {
   if (matchingElement === null) return;
 
   const calendar = document.createElement('iframe');
-  calendar.src =
-    'https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Australia%2FMelbourne&bgcolor=%23ffffff&src=ZTg0YTEwNTViOWE4YjQzOTkwNTFkZWUxOWYyMmFhYzBmNjBmMDMxYzY5OGU3ZmM5ODFmNGZmODNkMjQ2OGRlY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23795548';
-  calendar.width = 800;
-  calendar.height = 600;
-  calendar.style = 'border:solid 1px #777';
+  calendar.src = 'https://embed.styledcalendar.com/#rrHMH9eJ8obp3uCRBg1m';
+  calendar.style = 'width: 100%; border: none;';
+  calendar.class = 'styled-calendar-container';
+  calendar.setAttribute('data-cy', 'calendar-embed-iframe');
+  calendar.title = 'Styled Calendar';
   calendar.frameborder = '0';
   calendar.scrolling = 'no';
 
