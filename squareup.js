@@ -110,7 +110,6 @@ const main = () => {
 };
 
 const replaceCalendar = () => {
-  console.log('');
   var xpath = "//p[text()='<Calendar />']";
   var matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
     .singleNodeValue;
@@ -125,6 +124,7 @@ const replaceCalendar = () => {
   calendar.title = 'Styled Calendar';
   calendar.frameborder = '0';
   calendar.scrolling = 'no';
+  calendar.height = 800;
 
   const container = matchingElement.parentNode;
   container.replaceChild(calendar, matchingElement);
