@@ -124,7 +124,7 @@ const replaceCalendar = () => {
   calendar.title = 'Styled Calendar';
   calendar.frameborder = '0';
   calendar.scrolling = 'no';
-  calendar.height = 800;
+  calendar.height = '800';
 
   const container = matchingElement.parentNode;
   container.replaceChild(calendar, matchingElement);
