@@ -1,13 +1,40 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <title>Malvern Lacrosse Club - Jobs</title>
+    <link id="dynamic-favicon" rel="shortcut icon" href="https://malvern-lacrosse-club.square.site/uploads/b/5dab1320-d27f-11ed-a0cf-b1b20715f258/MalvernLogo.png"></head>
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <script
+      src="https://unpkg.com/react@latest/umd/react.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js"></script>
+    <script
+      src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@latest/babel.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Fonts to support Material Design -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    />
+    <!-- Icons to support Material Design -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
   </head>
   <body>
     <div id="info"></div>
-    <script type="module">
+    <div id="root"></div>
+    <script type="text/babel" data-type="module">
       import ICAL from "https://unpkg.com/ical.js";
 
       const WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -18,7 +45,7 @@
         "https://calendar.google.com/calendar/ical/b1d3ab240ee0822207440a42bbb41613f8782cc715a3c3602c921d5b966023c4%40group.calendar.google.com/public/basic.ics", // Seniors
       ];
 
-      const getEvents = async (calendar) => {
+      const getFutureEvents = async (calendar) => {
         return await fetch(`https://cors-anywhere.herokuapp.com/${calendar}`)
           .then((resp) => resp.text())
           .then((text) => {
@@ -26,62 +53,171 @@
             const thisWeeksEvents = events.filter((e) => {
               const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
               return (
-                start > new Date() &&
-                start < new Date(new Date().getTime() + WEEK)
+                start > new Date()
               );
             });
             return thisWeeksEvents;
           });
       };
 
-      const allThisWeekEvents = await Promise.all(
-        calendars.map(async (calendar) => getEvents(calendar)),
+      const getFutureJobs = (events) => {
+        return events
+          .map((e) => {
+            const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
+            const end = new Date(e[1].find((a) => a[0] === "dtend")[3]);
+            const summary = e[1].find((a) => a[0] === "summary")?.[3] ?? "";
+            const description =
+              e[1].find((a) => a[0] === "description")?.[3] ?? "";
+            const location = e[1].find((a) => a[0] === "location")?.[3] ?? "";
+            const assignees = description
+              .split("\n")
+              .map((s) => s.match(/@(.+)/))
+              .filter(Boolean)
+              .map((a) => {
+                return {
+                  name: a[1].split(" - ")[0],
+                  role: a[1].split(" - ")?.[1] ?? "",
+                };
+              });
+            return {
+              start,
+              end,
+              location,
+              title: summary,
+              assignees,
+            };
+          })
+          .filter((e) => e.assignees.length > 0)
+          .sort((a, b) => a.start - b.start);
+      };
+
+      const {
+        colors,
+        CssBaseline,
+        ThemeProvider,
+        Typography,
+        Container,
+        createTheme,
+        Box,
+        SvgIcon,
+        Link,
+        Stack,
+        Card,
+        CardContent,
+        Grid,
+        CircularProgress,
+      } = MaterialUI;
+
+      // Create a theme instance.
+      const theme = createTheme({
+        typography: {
+          allVariants: {
+            color: "#fff",
+          },
+        },
+        palette: {
+          text: {
+            primary: "#fff",
+            secondary: "#eee",
+          },
+          background: {
+            default: "#000",
+            paper: "#111", // your color
+          },
+          primary: {
+            main: "rgb(237, 29, 36)",
+          },
+          secondary: {
+            main: "#19857b",
+          },
+          error: {
+            main: colors.red.A400,
+          },
+        },
+      });
+
+      function Job({ job }) {
+        const { start, end, location, title, assignees } = job;
+        return (
+          <Card sx={start < new Date(new Date().getTime() + WEEK) ? {backgroundColor: "rgb(237, 29, 36)"} : {}}>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                {title}
+              </Typography>
+              <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                {start.toLocaleString("en-GB", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                })}{" "}
+                -{" "}
+                {end.toLocaleString("en-GB", {
+                  hour: "numeric",
+                  minute: "numeric",
+                })}
+              </Typography>
+              {assignees.map((a) => (
+                <Typography variant="body2" key={a.name} fontWeight={700}>
+                  {a.role.length > 0 ? `${a.role}: ` : ""}{a.name}
+                </Typography>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      }
+
+      function Jobs() {
+        const [jobs, setJobs] = React.useState([]);
+        const [loading, setLoading] = React.useState(true);
+
+        React.useEffect(()=>{
+          async function fetchData () {
+            await Promise.all(calendars.map(getFutureEvents)).then((events) =>
+              setJobs(getFutureJobs(events.flat())),
+            );
+            setLoading(false)
+          }
+        fetchData()
+      }, []);
+        if (loading) {
+          return <CircularProgress />;
+        }
+        return (
+          <Grid container spacing={2}>
+            {jobs.map((job, index) => {
+              return (
+                <Grid item key={index}>
+                  <Job job={job} />
+                </Grid>
+              );
+            })}
+          </Grid>
+        );
+      }
+
+      function App() {
+        return (
+          <Box sx={{ padding: 2 }}>
+            <Stack spacing={2} alignItems="center">
+              <Typography variant="h3" component="h1">
+                Malvern Job Board
+              </Typography>
+              <Jobs />
+            </Stack>
+          </Box>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <App />
+        </ThemeProvider>,
       );
-      const thisWeeksJobs = allThisWeekEvents
-        .flat()
-        .map((e) => {
-          const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
-          const end = new Date(e[1].find((a) => a[0] === "dtend")[3]);
-          const summary = e[1].find((a) => a[0] === "summary")?.[3] ?? "";
-          const description =
-            e[1].find((a) => a[0] === "description")?.[3] ?? "";
-          const location = e[1].find((a) => a[0] === "location")?.[3] ?? "";
-          const assignees = description
-            .split("\n")
-            .map((s) => s.match(/@(.+)/))
-            .filter(Boolean)
-            .map((a) => {
-              return {
-                name: a[1].split(" - ")[0],
-                role: a[1].split(" - ")?.[1] ?? "",
-              };
-            });
-          return {
-            start,
-            end,
-            location,
-            title: summary,
-            assignees,
-          };
-        })
-        .filter((e) => e.assignees.length > 0);
-      console.log(thisWeeksJobs);
-      document.getElementById("info").innerHTML = thisWeeksJobs
-        .map((job) => {
-          return `
-            <div>
-              <h2>${job.title}</h2>
-              <p>${job.location}</p>
-              <p>${job.start.toLocaleString()} - ${job.end.toLocaleString()}</p>
-              <p>${job.assignees
-                .map((a) =>
-                  a.role.length > 0 ? `${a.name} - ${a.role}` : `${a.name}`,
-                )
-                .join(", ")}</p>
-            </div>
-          `;
-        })
-        .join("");
     </script>
   </body>
 </html>
