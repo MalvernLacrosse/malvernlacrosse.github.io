@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="info"></div>
+    <script type="module">
+      import ICAL from "https://unpkg.com/ical.js";
+
+      const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+      const calendars = [
+        "https://calendar.google.com/calendar/ical/e84a1055b9a8b4399051dee19f22aac0f60f031c698e7fc981f4ff83d2468dec%40group.calendar.google.com/public/basic.ics", // All
+        "https://calendar.google.com/calendar/ical/9d818702dc62ae4ec146960f743195d892da366795b87034ff77d55954cf68ff%40group.calendar.google.com/public/basic.ics", // Juniors
+        "https://calendar.google.com/calendar/ical/b1d3ab240ee0822207440a42bbb41613f8782cc715a3c3602c921d5b966023c4%40group.calendar.google.com/public/basic.ics", // Seniors
+      ];
+
+      const getEvents = async (calendar) => {
+        return await fetch(`https://cors-anywhere.herokuapp.com/${calendar}`)
+          .then((resp) => resp.text())
+          .then((text) => {
+            const events = ICAL.parse(text)[2].filter((e) => e[0] === "vevent");
+            const thisWeeksEvents = events.filter((e) => {
+              const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
+              return (
+                start > new Date() &&
+                start < new Date(new Date().getTime() + WEEK)
+              );
+            });
+            return thisWeeksEvents;
+          });
+      };
+
+      const allThisWeekEvents = await Promise.all(
+        calendars.map(async (calendar) => getEvents(calendar)),
+      );
+      const thisWeeksJobs = allThisWeekEvents
+        .flat()
+        .map((e) => {
+          const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
+          const end = new Date(e[1].find((a) => a[0] === "dtend")[3]);
+          const summary = e[1].find((a) => a[0] === "summary")?.[3] ?? "";
+          const description =
+            e[1].find((a) => a[0] === "description")?.[3] ?? "";
+          const location = e[1].find((a) => a[0] === "location")?.[3] ?? "";
+          const assignees = description
+            .split("\n")
+            .map((s) => s.match(/@(.+)/))
+            .filter(Boolean)
+            .map((a) => {
+              return {
+                name: a[1].split(" - ")[0],
+                role: a[1].split(" - ")?.[1] ?? "",
+              };
+            });
+          return {
+            start,
+            end,
+            location,
+            title: summary,
+            assignees,
+          };
+        })
+        .filter((e) => e.assignees.length > 0);
+      console.log(thisWeeksJobs);
+      document.getElementById("info").innerHTML = thisWeeksJobs
+        .map((job) => {
+          return `
+            <div>
+              <h2>${job.title}</h2>
+              <p>${job.location}</p>
+              <p>${job.start.toLocaleString()} - ${job.end.toLocaleString()}</p>
+              <p>${job.assignees
+                .map((a) =>
+                  a.role.length > 0 ? `${a.name} - ${a.role}` : `${a.name}`,
+                )
+                .join(", ")}</p>
+            </div>
+          `;
+        })
+        .join("");
+    </script>
+  </body>
+</html>
