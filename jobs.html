@@ -46,7 +46,7 @@
       ];
 
       const getFutureEvents = async (calendar) => {
-        return await fetch(`https://cors-anywhere.herokuapp.com/${calendar}`)
+        return await fetch(`https://cors-proxy.fringe.zone/${calendar}`)
           .then((resp) => resp.text())
           .then((text) => {
             const events = ICAL.parse(text)[2].filter((e) => e[0] === "vevent");
