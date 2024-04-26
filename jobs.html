@@ -106,6 +106,8 @@
         CardContent,
         Grid,
         CircularProgress,
+        Autocomplete,
+        TextField,
       } = MaterialUI;
 
       // Create a theme instance.
@@ -171,29 +173,43 @@
       function Jobs() {
         const [jobs, setJobs] = React.useState([]);
         const [loading, setLoading] = React.useState(true);
+        const [search, setSearch] = React.useState("");
 
         React.useEffect(()=>{
-          async function fetchData () {
-            await Promise.all(calendars.map(getFutureEvents)).then((events) =>
-              setJobs(getFutureJobs(events.flat())),
-            );
-            setLoading(false)
-          }
-        fetchData()
-      }, []);
-        if (loading) {
-          return <CircularProgress />;
-        }
+            async function fetchData () {
+              await Promise.all(calendars.map(getFutureEvents)).then((events) =>
+                setJobs(getFutureJobs(events.flat())),
+              );
+              setLoading(false)
+            }
+          fetchData()
+        }, []);
+
+        const assignees = jobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?"))
         return (
+          <>
+          <Autocomplete
+          value={search}
+          onChange={(event, newValue) => {
+            setSearch(newValue ?? "");
+          }}
+          sx={{marginBottom: 2, width: 400}}
+          options={assignees}
+          renderInput={(params) => (
+            <TextField {...params}  focused placeholder="Search for your jobs" />
+          )}
+        />
+          {loading ? <CircularProgress /> :
           <Grid container spacing={2}>
-            {jobs.map((job, index) => {
+            {jobs.filter(job=>job.assignees.some(a=>a.name.toLowerCase().includes(search.toLowerCase()))).map((job, index) => {
               return (
                 <Grid item key={index}>
                   <Job job={job} />
                 </Grid>
               );
             })}
-          </Grid>
+          </Grid>}
+        </>
         );
       }
 
