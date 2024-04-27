@@ -323,13 +323,13 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
         const assignees = [...new Set(filteredJobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?")).sort())]
         return (
           <>
-          <Stack direction="row" spacing={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
             <Autocomplete
               value={search}
               onChange={(event, newValue) => {
                 setSearch(newValue ?? "");
               }}
-              sx={{marginBottom: 2, width: 400}}
+              sx={{marginBottom: 2, width: 350}}
               options={assignees}
               renderInput={(params) => (
                 <TextField {...params}  focused placeholder="Search for your jobs" />
