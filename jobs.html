@@ -185,7 +185,7 @@
           fetchData()
         }, []);
 
-        const assignees = jobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?"))
+        const assignees = [...new Set(jobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?")).sort())]
         return (
           <>
           <Autocomplete
