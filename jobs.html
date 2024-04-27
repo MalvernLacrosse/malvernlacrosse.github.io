@@ -112,6 +112,8 @@
         ToggleButtonGroup,
         styled,
         Tooltip,
+        Button,
+        CardActions
       } = MaterialUI;
 
       // Create a theme instance.
@@ -146,10 +148,71 @@
         },
       });
 
+      function buildMailtoForMissingJob(job){
+        const startDateTime = job.start.toLocaleString("en-GB", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })
+        const to = "committee@malvernlacrosse.com"
+        const subject = `Job Assignment Request: ${job.title} @ ${startDateTime}`
+        const body = `Hi Committee!
+
+I'd like to fill the role for the event ${job.title} at ${startDateTime}
+
+Thanks,
+
+`
+
+        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      }
+
+      function buildMailtoForSwitchJob(job){
+        const startDateTime = job.start.toLocaleString("en-GB", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })
+        const to = "committee@malvernlacrosse.com"
+        const subject = `Switch Job Assignment Request: ${job.title} @ ${startDateTime}`
+        const body = `Hi Committee!
+
+I'd like to switch with PERSON the role for the event ${job.title} at ${startDateTime}
+        
+Thanks,
+
+`
+
+        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      }
+
+      const InvertButton = styled(Button)(({ theme, invert, variant }) => (invert ? {
+        color: variant === "outlined" ? "#fff" : theme.palette.primary.main,
+        backgroundColor: variant === "outlined" ? "transparent" : "#fff",
+        borderColor: variant === "outlined" ? "#fff": "transparent",
+        '&:hover': {
+          backgroundColor: variant === "outlined" ? "transparent" : "#eee",
+          borderColor: variant === "outlined" ? "#ddd": "transparent",
+          color: variant === "outlined" ? "#ddd" : theme.palette.primary.main,
+
+        },
+      } : {}));
+
       function Job({ job }) {
         const { start, end, location, title, assignees } = job;
+        const missingRole = assignees.some(a=>a.name.startsWith("?"))
+        const anyAssigned = assignees.some(a=>!a.name.startsWith("?"))
+        
+        const missingRoleEmail = buildMailtoForMissingJob(job)
+        const switchRolesEmail = buildMailtoForSwitchJob(job)
+        const thisWeek = start < new Date(new Date().getTime() + WEEK)
+
         return (
-          <Card sx={start < new Date(new Date().getTime() + WEEK) ? {backgroundColor: "rgb(237, 29, 36)"} : {}}>
+          <Card sx={thisWeek ? {backgroundColor: "rgb(237, 29, 36)"} : {}}>
             <CardContent>
               <Typography variant="h5" component="div">
                 {title}
@@ -173,7 +236,12 @@
                   {a.role.length > 0 ? `${a.role}: ` : ""}{a.name}
                 </Typography>
               ))}
+              
             </CardContent>
+            <CardActions>
+              {missingRole && <InvertButton invert={thisWeek} variant="contained" href={missingRoleEmail}>Fill the missing role!</InvertButton>}
+              {anyAssigned && <InvertButton invert variant="outlined" href={switchRolesEmail}>Request to switch roles</InvertButton>}
+            </CardActions>
           </Card>
         );
       }
