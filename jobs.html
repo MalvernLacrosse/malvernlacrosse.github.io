@@ -210,6 +210,8 @@ Thanks,
         const missingRoleEmail = buildMailtoForMissingJob(job)
         const switchRolesEmail = buildMailtoForSwitchJob(job)
         const thisWeek = start < new Date(new Date().getTime() + WEEK)
+        const isDinner = title.includes("Dinner")
+        const DINNER_SIGNUP_LINK = "https://forms.gle/URgWfL9yUSG6eCS49"
 
         return (
           <Card sx={thisWeek ? {backgroundColor: "rgb(237, 29, 36)"} : {}}>
@@ -239,7 +241,7 @@ Thanks,
               
             </CardContent>
             <CardActions>
-              {missingRole && <InvertButton invert={thisWeek} variant="contained" href={missingRoleEmail}>Fill the missing role!</InvertButton>}
+              {missingRole && <InvertButton invert={thisWeek} variant="contained" target="_blank" href={ isDinner ? DINNER_SIGNUP_LINK : missingRoleEmail}>Fill the missing role!</InvertButton>}
               {anyAssigned && <InvertButton invert variant="outlined" href={switchRolesEmail}>Request to switch roles</InvertButton>}
             </CardActions>
           </Card>
