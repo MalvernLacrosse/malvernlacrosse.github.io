@@ -108,6 +108,10 @@
         CircularProgress,
         Autocomplete,
         TextField,
+        ToggleButton,
+        ToggleButtonGroup,
+        styled,
+        Tooltip,
       } = MaterialUI;
 
       // Create a theme instance.
@@ -125,12 +129,16 @@
           background: {
             default: "#000",
             paper: "#111", // your color
+            light: "#222"
           },
           primary: {
             main: "rgb(237, 29, 36)",
           },
           secondary: {
             main: "#19857b",
+          },
+          white: {
+            main: "#fff",
           },
           error: {
             main: colors.red.A400,
@@ -170,10 +178,50 @@
         );
       }
 
+      function BinIcon(props){
+        return  (
+          <SvgIcon {...props} viewBox="0 -960 960 960">
+            <path fill='inherit' d="M280-720v520-520Zm170 600H280q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v172q-17-5-39.5-8.5T680-560v-160H280v520h132q6 21 16 41.5t22 38.5Zm-90-160h40q0-63 20-103.5l20-40.5v-216h-80v360Zm160-230q17-11 38.5-22t41.5-16v-92h-80v130ZM680-80q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80Zm66-106 28-28-74-74v-112h-40v128l86 86Z"/>
+          </SvgIcon>
+        )
+      }
+
+      function BeerIcon(props){
+        return (
+          <SvgIcon {...props} viewBox="0 -960 960 960">
+            <path d="M320-200h280v-400h-80q-28 0-46 14t-43 41q-20 22-46.5 45.5T320-465v265Zm-80 80v-346q-52-14-86-56t-34-98q0-53 30.5-94t78.5-57q23-48 68.5-78T400-879q35 0 65.5 12t55.5 32q10-2 19-3.5t20-1.5q66 0 113 47t47 113q0 22-5.5 42T698-600h62q33 0 56.5 23.5T840-520v240q0 33-23.5 56.5T760-200h-80v80H240Zm-40-500q0 33 23.5 56.5T280-540q32 0 54.5-21t46.5-47q25-27 56.5-49.5T520-680h120q0-33-23.5-56.5T560-760q-25 0-42 6.5l-17 6.5-31-26q-11-9-28.5-17.5T400-799q-32 0-58.5 17T301-736l-14 30-32 11q-25 8-40 28.5T200-620Zm480 340h80v-240h-80v240Zm-360 80h280-280Z"/>
+          </SvgIcon>
+        )
+      }
+
+      function DinnerIcon(props){
+        return (
+          <SvgIcon {...props} viewBox="0 -960 960 960">
+            <path d="M280-80v-366q-51-14-85.5-56T160-600v-280h80v280h40v-280h80v280h40v-280h80v280q0 56-34.5 98T360-446v366h-80Zm400 0v-320H560v-280q0-83 58.5-141.5T760-880v800h-80Z"/>
+          </SvgIcon>
+        )
+      }
+
+
+const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
+  "&.Mui-selected, &.Mui-selected:hover": {
+    color: "white",
+    backgroundColor: theme.palette.primary.main
+  },
+    color: "white",
+    backgroundColor: theme.palette.background.paper,
+    "&:hover": {
+      color: "white",
+      backgroundColor: theme.palette.background.light
+    }
+  
+  }));
+
       function Jobs() {
         const [jobs, setJobs] = React.useState([]);
         const [loading, setLoading] = React.useState(true);
         const [search, setSearch] = React.useState("");
+        const [toggleValue, setToggleValue] = React.useState(null);
 
         React.useEffect(()=>{
             async function fetchData () {
@@ -185,31 +233,66 @@
           fetchData()
         }, []);
 
-        const assignees = [...new Set(jobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?")).sort())]
+        const filteredJobs = jobs.filter(j=>{
+          console.log(j.title)
+          if (toggleValue === "bins") {return j.title.includes("Bins")}
+          if (toggleValue === "dinners") {return j.title.includes("Dinner")}
+          if (toggleValue === "canteen") {return j.title.includes("Canteen")}
+          return true
+        })
+
+        const assignees = [...new Set(filteredJobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?")).sort())]
         return (
           <>
-          <Autocomplete
-          value={search}
-          onChange={(event, newValue) => {
-            setSearch(newValue ?? "");
-          }}
-          sx={{marginBottom: 2, width: 400}}
-          options={assignees}
-          renderInput={(params) => (
-            <TextField {...params}  focused placeholder="Search for your jobs" />
-          )}
-        />
-          {loading ? <CircularProgress /> :
-          <Grid container spacing={2}>
-            {jobs.filter(job=>job.assignees.some(a=>a.name.toLowerCase().includes(search.toLowerCase()))).map((job, index) => {
-              return (
-                <Grid item key={index}>
-                  <Job job={job} />
-                </Grid>
-              );
-            })}
-          </Grid>}
-        </>
+          <Stack direction="row" spacing={2}>
+            <Autocomplete
+              value={search}
+              onChange={(event, newValue) => {
+                setSearch(newValue ?? "");
+              }}
+              sx={{marginBottom: 2, width: 400}}
+              options={assignees}
+              renderInput={(params) => (
+                <TextField {...params}  focused placeholder="Search for your jobs" />
+              )}
+            />
+            <ToggleButtonGroup
+            color="primary"
+  size="lg"
+  variant="soft"
+      value={toggleValue}
+      exclusive
+      onChange={(event, newToggle)=>setToggleValue(newToggle)}
+    >
+    <Tooltip title="Job: Bins">
+      <CustomToggleButton value="bins">
+        <BinIcon color='white'/>
+      </CustomToggleButton>
+      </Tooltip>
+      <Tooltip title="Job: Dinners">
+      <CustomToggleButton value="dinners">
+        <DinnerIcon color='white'/>
+      </CustomToggleButton>
+    </Tooltip>
+    <Tooltip title="Job: Canteen">
+      <CustomToggleButton value="canteen">
+        <BeerIcon color='white'/>
+      </CustomToggleButton>
+    </Tooltip>
+
+    </ToggleButtonGroup>
+              </Stack>
+            {loading ? <CircularProgress /> :
+            <Grid container spacing={2}>
+              {filteredJobs.filter(job=>job.assignees.some(a=>a.name.toLowerCase().includes(search.toLowerCase()))).map((job, index) => {
+                return (
+                  <Grid item key={index}>
+                    <Job job={job} />
+                  </Grid>
+                );
+              })}
+            </Grid>}
+          </>
         );
       }
 
