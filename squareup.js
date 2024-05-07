@@ -123,7 +123,6 @@ const replaceCalendar = () => {
   calendar.setAttribute('data-cy', 'calendar-embed-iframe');
   calendar.title = 'Styled Calendar';
   calendar.frameborder = '0';
-  calendar.scrolling = 'no';
   calendar.height = '3000';
 
   const container = matchingElement.parentNode;
