@@ -1,25 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta property="og:title" content="Malvern Lacrosse Club - Jobs">
-    <meta property="og:image" content="https://malvern-lacrosse-club.square.site/uploads/b/5dab1320-d27f-11ed-a0cf-b1b20715f258/MalvernLogo.png">
+    <meta property="og:title" content="Malvern Lacrosse Club - Jobs" />
+    <meta
+      property="og:image"
+      content="https://malvern-lacrosse-club.square.site/uploads/b/5dab1320-d27f-11ed-a0cf-b1b20715f258/MalvernLogo.png"
+    />
     <meta charset="utf-8" />
     <title>Malvern Lacrosse Club - Jobs</title>
-    <link id="dynamic-favicon" rel="shortcut icon" href="https://malvern-lacrosse-club.square.site/uploads/b/5dab1320-d27f-11ed-a0cf-b1b20715f258/MalvernLogo.png"></head>
+    <link
+      id="dynamic-favicon"
+      rel="shortcut icon"
+      href="https://malvern-lacrosse-club.square.site/uploads/b/5dab1320-d27f-11ed-a0cf-b1b20715f258/MalvernLogo.png"
+    />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
-    <script
-      src="https://unpkg.com/react@latest/umd/react.development.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js"></script>
     <script
       src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"
       crossorigin="anonymous"
     ></script>
-    <script
-      src="https://unpkg.com/@babel/standalone@latest/babel.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://unpkg.com/@babel/standalone@latest/babel.min.js" crossorigin="anonymous"></script>
     <!-- Fonts to support Material Design -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,35 +29,30 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
     />
     <!-- Icons to support Material Design -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   </head>
   <body>
     <div id="info"></div>
     <div id="root"></div>
     <script type="text/babel" data-type="module">
-      import ICAL from "https://unpkg.com/ical.js";
+      import ICAL from 'https://unpkg.com/ical.js';
 
       const WEEK = 7 * 24 * 60 * 60 * 1000;
 
       const calendars = [
-        "https://calendar.google.com/calendar/ical/e84a1055b9a8b4399051dee19f22aac0f60f031c698e7fc981f4ff83d2468dec%40group.calendar.google.com/public/basic.ics", // All
-        "https://calendar.google.com/calendar/ical/9d818702dc62ae4ec146960f743195d892da366795b87034ff77d55954cf68ff%40group.calendar.google.com/public/basic.ics", // Juniors
-        "https://calendar.google.com/calendar/ical/b1d3ab240ee0822207440a42bbb41613f8782cc715a3c3602c921d5b966023c4%40group.calendar.google.com/public/basic.ics", // Seniors
+        'https://calendar.google.com/calendar/ical/e84a1055b9a8b4399051dee19f22aac0f60f031c698e7fc981f4ff83d2468dec%40group.calendar.google.com/public/basic.ics', // All
+        'https://calendar.google.com/calendar/ical/9d818702dc62ae4ec146960f743195d892da366795b87034ff77d55954cf68ff%40group.calendar.google.com/public/basic.ics', // Juniors
+        'https://calendar.google.com/calendar/ical/b1d3ab240ee0822207440a42bbb41613f8782cc715a3c3602c921d5b966023c4%40group.calendar.google.com/public/basic.ics', // Seniors
       ];
 
       const getFutureEvents = async (calendar) => {
         return await fetch(`https://cors-proxy.fringe.zone/${calendar}`)
           .then((resp) => resp.text())
           .then((text) => {
-            const events = ICAL.parse(text)[2].filter((e) => e[0] === "vevent");
+            const events = ICAL.parse(text)[2].filter((e) => e[0] === 'vevent');
             const thisWeeksEvents = events.filter((e) => {
-              const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
-              return (
-                start > new Date()
-              );
+              const start = new Date(e[1].find((a) => a[0] === 'dtstart')[3]);
+              return start > new Date();
             });
             return thisWeeksEvents;
           });
@@ -65,20 +61,19 @@
       const getFutureJobs = (events) => {
         return events
           .map((e) => {
-            const start = new Date(e[1].find((a) => a[0] === "dtstart")[3]);
-            const end = new Date(e[1].find((a) => a[0] === "dtend")[3]);
-            const summary = e[1].find((a) => a[0] === "summary")?.[3] ?? "";
-            const description =
-              e[1].find((a) => a[0] === "description")?.[3] ?? "";
-            const location = e[1].find((a) => a[0] === "location")?.[3] ?? "";
+            const start = new Date(e[1].find((a) => a[0] === 'dtstart')[3]);
+            const end = new Date(e[1].find((a) => a[0] === 'dtend')[3]);
+            const summary = e[1].find((a) => a[0] === 'summary')?.[3] ?? '';
+            const description = e[1].find((a) => a[0] === 'description')?.[3] ?? '';
+            const location = e[1].find((a) => a[0] === 'location')?.[3] ?? '';
             const assignees = description
-              .split("\n")
+              .split('\n')
               .map((s) => s.match(/@(.+)/))
               .filter(Boolean)
               .map((a) => {
                 return {
-                  name: a[1].split(" - ")[0],
-                  role: a[1].split(" - ")?.[1] ?? "",
+                  name: a[1].split(' - ')[0],
+                  role: a[1].split(' - ')?.[1] ?? '',
                 };
               });
             return {
@@ -115,34 +110,34 @@
         styled,
         Tooltip,
         Button,
-        CardActions
+        CardActions,
       } = MaterialUI;
 
       // Create a theme instance.
       const theme = createTheme({
         typography: {
           allVariants: {
-            color: "#fff",
+            color: '#fff',
           },
         },
         palette: {
           text: {
-            primary: "#fff",
-            secondary: "#eee",
+            primary: '#fff',
+            secondary: '#eee',
           },
           background: {
-            default: "#000",
-            paper: "#111", // your color
-            light: "#222"
+            default: '#000',
+            paper: '#111', // your color
+            light: '#222',
           },
           primary: {
-            main: "rgb(237, 29, 36)",
+            main: 'rgb(237, 29, 36)',
           },
           secondary: {
-            main: "#19857b",
+            main: '#19857b',
           },
           white: {
-            main: "#fff",
+            main: '#fff',
           },
           error: {
             main: colors.red.A400,
@@ -150,233 +145,271 @@
         },
       });
 
-      function buildMailtoForMissingJob(job){
-        const startDateTime = job.start.toLocaleString("en-GB", {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-        })
-        const to = "committee@malvernlacrosse.com"
-        const subject = `Job Assignment Request: ${job.title} @ ${startDateTime}`
+      function buildMailtoForMissingJob(job) {
+        const startDateTime = job.start.toLocaleString('en-GB', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+        const to = 'committee@malvernlacrosse.com';
+        const subject = `Job Assignment Request: ${job.title} @ ${startDateTime}`;
         const body = `Hi Committee!
 
 I'd like to fill the role for the event ${job.title} at ${startDateTime}
 
 Thanks,
 
-`
+`;
 
-        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       }
 
-      function buildMailtoForSwitchJob(job){
-        const startDateTime = job.start.toLocaleString("en-GB", {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-        })
-        const to = "committee@malvernlacrosse.com"
-        const subject = `Switch Job Assignment Request: ${job.title} @ ${startDateTime}`
+      function buildMailtoForSwitchJob(job) {
+        const startDateTime = job.start.toLocaleString('en-GB', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+        const to = 'committee@malvernlacrosse.com';
+        const subject = `Switch Job Assignment Request: ${job.title} @ ${startDateTime}`;
         const body = `Hi Committee!
 
 I'd like to switch with PERSON the role for the event ${job.title} at ${startDateTime}
         
 Thanks,
 
-`
+`;
 
-        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       }
 
-      const InvertButton = styled(Button)(({ theme, invert, variant }) => (invert ? {
-        color: variant === "outlined" ? "#fff" : theme.palette.primary.main,
-        backgroundColor: variant === "outlined" ? "transparent" : "#fff",
-        borderColor: variant === "outlined" ? "#fff": "transparent",
-        '&:hover': {
-          backgroundColor: variant === "outlined" ? "transparent" : "#eee",
-          borderColor: variant === "outlined" ? "#ddd": "transparent",
-          color: variant === "outlined" ? "#ddd" : theme.palette.primary.main,
-
-        },
-      } : {}));
+      const InvertButton = styled(Button)(({ theme, invert, variant }) =>
+        invert
+          ? {
+              color: variant === 'outlined' ? '#fff' : theme.palette.primary.main,
+              backgroundColor: variant === 'outlined' ? 'transparent' : '#fff',
+              borderColor: variant === 'outlined' ? '#fff' : 'transparent',
+              '&:hover': {
+                backgroundColor: variant === 'outlined' ? 'transparent' : '#eee',
+                borderColor: variant === 'outlined' ? '#ddd' : 'transparent',
+                color: variant === 'outlined' ? '#ddd' : theme.palette.primary.main,
+              },
+            }
+          : {}
+      );
 
       function Job({ job }) {
         const { start, end, location, title, assignees } = job;
-        const missingRole = assignees.some(a=>a.name.startsWith("?"))
-        const anyAssigned = assignees.some(a=>!a.name.startsWith("?"))
-        
-        const missingRoleEmail = buildMailtoForMissingJob(job)
-        const switchRolesEmail = buildMailtoForSwitchJob(job)
-        const thisWeek = start < new Date(new Date().getTime() + WEEK)
-        const isDinner = title.includes("Dinner")
-        const DINNER_SIGNUP_LINK = "https://forms.gle/URgWfL9yUSG6eCS49"
+        const missingRole = assignees.some((a) => a.name.startsWith('?'));
+        const anyAssigned = assignees.some((a) => !a.name.startsWith('?'));
+
+        const missingRoleEmail = buildMailtoForMissingJob(job);
+        const switchRolesEmail = buildMailtoForSwitchJob(job);
+        const thisWeek = start < new Date(new Date().getTime() + WEEK);
+        const isDinner = title.includes('Dinner');
+        const DINNER_SIGNUP_LINK = 'https://forms.gle/URgWfL9yUSG6eCS49';
 
         return (
-          <Card sx={thisWeek ? {backgroundColor: "rgb(237, 29, 36)"} : {}}>
+          <Card sx={thisWeek ? { backgroundColor: 'rgb(237, 29, 36)' } : {}}>
             <CardContent>
               <Typography variant="h5" component="div">
                 {title}
               </Typography>
               <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                {start.toLocaleString("en-GB", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                })}{" "}
-                -{" "}
-                {end.toLocaleString("en-GB", {
-                  hour: "numeric",
-                  minute: "numeric",
+                {start.toLocaleString('en-GB', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}{' '}
+                -{' '}
+                {end.toLocaleString('en-GB', {
+                  hour: 'numeric',
+                  minute: 'numeric',
                 })}
               </Typography>
               {assignees.map((a) => (
                 <Typography variant="body2" key={a.name} fontWeight={700}>
-                  {a.role.length > 0 ? `${a.role}: ` : ""}{a.name}
+                  {a.role.length > 0 ? `${a.role}: ` : ''}
+                  {a.name}
                 </Typography>
               ))}
-              
             </CardContent>
             <CardActions>
-              {missingRole && <InvertButton invert={thisWeek} variant="contained" target="_blank" href={ isDinner ? DINNER_SIGNUP_LINK : missingRoleEmail}>Fill the missing role!</InvertButton>}
-              {anyAssigned && <InvertButton invert variant="outlined" href={switchRolesEmail}>Request to switch roles</InvertButton>}
+              {missingRole && (
+                <InvertButton
+                  invert={thisWeek}
+                  variant="contained"
+                  target="_blank"
+                  href={isDinner ? DINNER_SIGNUP_LINK : missingRoleEmail}
+                >
+                  Fill the missing role!
+                </InvertButton>
+              )}
+              {anyAssigned && (
+                <InvertButton invert variant="outlined" href={switchRolesEmail}>
+                  Request to switch roles
+                </InvertButton>
+              )}
             </CardActions>
           </Card>
         );
       }
 
-      function BinIcon(props){
-        return  (
-          <SvgIcon {...props} viewBox="0 -960 960 960">
-            <path fill='inherit' d="M280-720v520-520Zm170 600H280q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v172q-17-5-39.5-8.5T680-560v-160H280v520h132q6 21 16 41.5t22 38.5Zm-90-160h40q0-63 20-103.5l20-40.5v-216h-80v360Zm160-230q17-11 38.5-22t41.5-16v-92h-80v130ZM680-80q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80Zm66-106 28-28-74-74v-112h-40v128l86 86Z"/>
-          </SvgIcon>
-        )
-      }
-
-      function BeerIcon(props){
+      function BinIcon(props) {
         return (
           <SvgIcon {...props} viewBox="0 -960 960 960">
-            <path d="M320-200h280v-400h-80q-28 0-46 14t-43 41q-20 22-46.5 45.5T320-465v265Zm-80 80v-346q-52-14-86-56t-34-98q0-53 30.5-94t78.5-57q23-48 68.5-78T400-879q35 0 65.5 12t55.5 32q10-2 19-3.5t20-1.5q66 0 113 47t47 113q0 22-5.5 42T698-600h62q33 0 56.5 23.5T840-520v240q0 33-23.5 56.5T760-200h-80v80H240Zm-40-500q0 33 23.5 56.5T280-540q32 0 54.5-21t46.5-47q25-27 56.5-49.5T520-680h120q0-33-23.5-56.5T560-760q-25 0-42 6.5l-17 6.5-31-26q-11-9-28.5-17.5T400-799q-32 0-58.5 17T301-736l-14 30-32 11q-25 8-40 28.5T200-620Zm480 340h80v-240h-80v240Zm-360 80h280-280Z"/>
+            <path
+              fill="inherit"
+              d="M280-720v520-520Zm170 600H280q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v172q-17-5-39.5-8.5T680-560v-160H280v520h132q6 21 16 41.5t22 38.5Zm-90-160h40q0-63 20-103.5l20-40.5v-216h-80v360Zm160-230q17-11 38.5-22t41.5-16v-92h-80v130ZM680-80q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80Zm66-106 28-28-74-74v-112h-40v128l86 86Z"
+            />
           </SvgIcon>
-        )
+        );
       }
 
-      function DinnerIcon(props){
+      function BeerIcon(props) {
         return (
           <SvgIcon {...props} viewBox="0 -960 960 960">
-            <path d="M280-80v-366q-51-14-85.5-56T160-600v-280h80v280h40v-280h80v280h40v-280h80v280q0 56-34.5 98T360-446v366h-80Zm400 0v-320H560v-280q0-83 58.5-141.5T760-880v800h-80Z"/>
+            <path d="M320-200h280v-400h-80q-28 0-46 14t-43 41q-20 22-46.5 45.5T320-465v265Zm-80 80v-346q-52-14-86-56t-34-98q0-53 30.5-94t78.5-57q23-48 68.5-78T400-879q35 0 65.5 12t55.5 32q10-2 19-3.5t20-1.5q66 0 113 47t47 113q0 22-5.5 42T698-600h62q33 0 56.5 23.5T840-520v240q0 33-23.5 56.5T760-200h-80v80H240Zm-40-500q0 33 23.5 56.5T280-540q32 0 54.5-21t46.5-47q25-27 56.5-49.5T520-680h120q0-33-23.5-56.5T560-760q-25 0-42 6.5l-17 6.5-31-26q-11-9-28.5-17.5T400-799q-32 0-58.5 17T301-736l-14 30-32 11q-25 8-40 28.5T200-620Zm480 340h80v-240h-80v240Zm-360 80h280-280Z" />
           </SvgIcon>
-        )
+        );
       }
 
-      function MissingIcon(props){
+      function DinnerIcon(props) {
         return (
           <SvgIcon {...props} viewBox="0 -960 960 960">
-            <path d="M240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Zm-14 120q17 0 28.5-11.5T520-360q0-17-11.5-28.5T480-400q-17 0-28.5 11.5T440-360q0 17 11.5 28.5T480-320Zm-30-128h61q0-25 6.5-40.5T544-526q18-20 35-40.5t17-53.5q0-42-32.5-71T483-720q-40 0-72.5 23T365-637l55 23q7-22 24.5-35.5T483-663q22 0 36.5 12t14.5 31q0 21-12.5 37.5T492-549q-20 21-31 42t-11 59Z"/>
+            <path d="M280-80v-366q-51-14-85.5-56T160-600v-280h80v280h40v-280h80v280h40v-280h80v280q0 56-34.5 98T360-446v366h-80Zm400 0v-320H560v-280q0-83 58.5-141.5T760-880v800h-80Z" />
           </SvgIcon>
-        )
+        );
       }
 
-const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
-  "&.Mui-selected, &.Mui-selected:hover": {
-    color: "white",
-    backgroundColor: theme.palette.primary.main
-  },
-    color: "white",
-    backgroundColor: theme.palette.background.paper,
-    "&:hover": {
-      color: "white",
-      backgroundColor: theme.palette.background.light
-    }
-  
-  }));
+      function MissingIcon(props) {
+        return (
+          <SvgIcon {...props} viewBox="0 -960 960 960">
+            <path d="M240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Zm-14 120q17 0 28.5-11.5T520-360q0-17-11.5-28.5T480-400q-17 0-28.5 11.5T440-360q0 17 11.5 28.5T480-320Zm-30-128h61q0-25 6.5-40.5T544-526q18-20 35-40.5t17-53.5q0-42-32.5-71T483-720q-40 0-72.5 23T365-637l55 23q7-22 24.5-35.5T483-663q22 0 36.5 12t14.5 31q0 21-12.5 37.5T492-549q-20 21-31 42t-11 59Z" />
+          </SvgIcon>
+        );
+      }
+
+      const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
+        '&.Mui-selected, &.Mui-selected:hover': {
+          color: 'white',
+          backgroundColor: theme.palette.primary.main,
+        },
+        color: 'white',
+        backgroundColor: theme.palette.background.paper,
+        '&:hover': {
+          color: 'white',
+          backgroundColor: theme.palette.background.light,
+        },
+      }));
 
       function Jobs() {
         const [jobs, setJobs] = React.useState([]);
         const [loading, setLoading] = React.useState(true);
-        const [search, setSearch] = React.useState("");
+        const [search, setSearch] = React.useState('');
         const [toggleValue, setToggleValue] = React.useState(null);
 
-        React.useEffect(()=>{
-            async function fetchData () {
-              await Promise.all(calendars.map(getFutureEvents)).then((events) =>
-                setJobs(getFutureJobs(events.flat())),
-              );
-              setLoading(false)
-            }
-          fetchData()
+        React.useEffect(() => {
+          async function fetchData() {
+            await Promise.all(calendars.map(getFutureEvents)).then((events) =>
+              setJobs(getFutureJobs(events.flat()))
+            );
+            setLoading(false);
+          }
+          fetchData();
         }, []);
 
-        const filteredJobs = jobs.filter(j=>{
-          console.log(j.title)
-          if (toggleValue === "bins") {return j.title.includes("Bins")}
-          if (toggleValue === "dinners") {return j.title.includes("Dinner")}
-          if (toggleValue === "canteen") {return j.title.includes("Canteen")}
-          if (toggleValue === "missing") {return j.assignees.some(a=>a.name.startsWith("?"))}
+        const filteredJobs = jobs.filter((j) => {
+          console.log(j.title);
+          if (toggleValue === 'bins') {
+            return j.title.includes('Bins');
+          }
+          if (toggleValue === 'dinners') {
+            return j.title.includes('Dinner');
+          }
+          if (toggleValue === 'canteen') {
+            return j.title.includes('Canteen');
+          }
+          if (toggleValue === 'missing') {
+            return j.assignees.some((a) => a.name.startsWith('?'));
+          }
 
-          return true
-        })
+          return true;
+        });
 
-        const assignees = [...new Set(filteredJobs.reduce((acc, cur)=> [...cur.assignees.map(a=>a.name), ...acc], []).filter(a=>!a.startsWith("?")).sort())]
+        const assignees = [
+          ...new Set(
+            filteredJobs
+              .reduce((acc, cur) => [...cur.assignees.map((a) => a.name), ...acc], [])
+              .filter((a) => !a.startsWith('?'))
+              .sort()
+          ),
+        ];
         return (
           <>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-            <Autocomplete
-              value={search}
-              onChange={(event, newValue) => {
-                setSearch(newValue ?? "");
-              }}
-              sx={{marginBottom: 2, width: 350}}
-              options={assignees}
-              renderInput={(params) => (
-                <TextField {...params}  focused placeholder="Search for your jobs" />
-              )}
-            />
-            <ToggleButtonGroup
-            color="primary"
-  size="lg"
-  variant="soft"
-      value={toggleValue}
-      exclusive
-      onChange={(event, newToggle)=>setToggleValue(newToggle)}
-    >
-    <Tooltip title="Job: Bins">
-      <CustomToggleButton value="bins">
-        <BinIcon color='white'/>
-      </CustomToggleButton>
-      </Tooltip>
-      <Tooltip title="Job: Dinners">
-      <CustomToggleButton value="dinners">
-        <DinnerIcon color='white'/>
-      </CustomToggleButton>
-    </Tooltip>
-    <Tooltip title="Job: Canteen">
-      <CustomToggleButton value="canteen">
-        <BeerIcon color='white'/>
-      </CustomToggleButton>
-    </Tooltip>
-    <Tooltip title="Jobs to fill">
-      <CustomToggleButton value="missing">
-        <MissingIcon color='white'/>
-      </CustomToggleButton>
-    </Tooltip>
-    </ToggleButtonGroup>
-              </Stack>
-            {loading ? <CircularProgress /> :
-            <Grid container spacing={2}>
-              {filteredJobs.filter(job=>job.assignees.some(a=>a.name.toLowerCase().includes(search.toLowerCase()))).map((job, index) => {
-                return (
-                  <Grid item key={index}>
-                    <Job job={job} />
-                  </Grid>
-                );
-              })}
-            </Grid>}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+              <Autocomplete
+                value={search}
+                onChange={(event, newValue) => {
+                  setSearch(newValue ?? '');
+                }}
+                sx={{ marginBottom: 2, width: 350 }}
+                options={assignees}
+                renderInput={(params) => <TextField {...params} focused placeholder="Search for your jobs" />}
+              />
+              <ToggleButtonGroup
+                color="primary"
+                size="lg"
+                variant="soft"
+                value={toggleValue}
+                exclusive
+                onChange={(event, newToggle) => setToggleValue(newToggle)}
+              >
+                <Tooltip title="Job: Bins">
+                  <CustomToggleButton value="bins">
+                    <BinIcon color="white" />
+                  </CustomToggleButton>
+                </Tooltip>
+                <Tooltip title="Job: Dinners">
+                  <CustomToggleButton value="dinners">
+                    <DinnerIcon color="white" />
+                  </CustomToggleButton>
+                </Tooltip>
+                <Tooltip title="Job: Canteen">
+                  <CustomToggleButton value="canteen">
+                    <BeerIcon color="white" />
+                  </CustomToggleButton>
+                </Tooltip>
+                <Tooltip title="Jobs to fill">
+                  <CustomToggleButton value="missing">
+                    <MissingIcon color="white" />
+                  </CustomToggleButton>
+                </Tooltip>
+              </ToggleButtonGroup>
+            </Stack>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <Grid container spacing={2}>
+                {filteredJobs
+                  .filter((job) =>
+                    job.assignees.some((a) => a.name.toLowerCase().includes(search.toLowerCase()))
+                  )
+                  .map((job, index) => {
+                    return (
+                      <Grid item key={index}>
+                        <Job job={job} />
+                      </Grid>
+                    );
+                  })}
+              </Grid>
+            )}
           </>
         );
       }
@@ -394,13 +427,13 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
         );
       }
 
-      const root = ReactDOM.createRoot(document.getElementById("root"));
+      const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <App />
-        </ThemeProvider>,
+        </ThemeProvider>
       );
     </script>
   </body>
